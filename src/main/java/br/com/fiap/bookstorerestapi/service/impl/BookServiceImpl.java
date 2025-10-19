@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
-    private final AuthorRepository authorRepository; // Necessário para associar o autor
+    private final AuthorRepository authorRepository;
     private final BookMapper bookMapper;
 
     public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository, BookMapper bookMapper) {
@@ -28,13 +28,10 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookRecord createBook(BookRecord bookRecord) {
-        // Busca a entidade Author usando o authorId do DTO
         Author author = authorRepository.findById(bookRecord.authorId())
-                .orElseThrow(() -> new NotFoundException("Author not found with id: " + bookRecord.authorId()));
+                .orElseThrow(() -> new NotFoundException("Autor não encontrado com o ID: " + bookRecord.authorId()));
 
-        // Converte o DTO do livro para uma entidade
         Book book = bookMapper.toEntity(bookRecord);
-        // Associa a entidade Author à entidade Book
         book.setAuthor(author);
 
         Book savedBook = bookRepository.save(book);
@@ -44,7 +41,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookRecord getBookById(Long id) {
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Book not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Livro não encontrado com o ID: " + id));
         return bookMapper.toRecord(book);
     }
 
@@ -58,10 +55,10 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookRecord updateBook(Long id, BookRecord bookRecord) {
         Book existingBook = bookRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Book not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Livro não encontrado com o ID: " + id));
 
         Author author = authorRepository.findById(bookRecord.authorId())
-                .orElseThrow(() -> new NotFoundException("Author not found with id: " + bookRecord.authorId()));
+                .orElseThrow(() -> new NotFoundException("Autor não encontrado com o ID: " + bookRecord.authorId()));
 
         existingBook.setTitle(bookRecord.title());
         existingBook.setIsbn(bookRecord.isbn());
@@ -74,7 +71,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
-            throw new NotFoundException("Book not found with id: " + id);
+            throw new NotFoundException("Livro não encontrado com o ID: " + id);
         }
         bookRepository.deleteById(id);
     }
@@ -82,7 +79,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookRecord> getBooksByAuthorId(Long authorId) {
         if (!authorRepository.existsById(authorId)) {
-            throw new NotFoundException("Author not found with id: " + authorId);
+            throw new NotFoundException("Autor não encontrado com o ID: " + authorId);
         }
         return bookRepository.findByAuthorId(authorId).stream()
                 .map(bookMapper::toRecord)

@@ -34,7 +34,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public AuthorRecord getAuthorById(Long id) {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Author not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Autor não encontrado com o ID: " + id));
         return authorMapper.toRecord(author);
     }
 
@@ -47,11 +47,9 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public AuthorRecord updateAuthor(Long id, AuthorRecord authorRecord) {
-        // Busca o autor primeiro; se não existir, lança a exceção.
         Author existingAuthor = authorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Author not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Autor não encontrado com o ID: " + id));
 
-        // Atualiza os dados do autor existente
         existingAuthor.setName(authorRecord.name());
         existingAuthor.setEmail(authorRecord.email());
 
@@ -62,7 +60,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public void deleteAuthor(Long id) {
         if (!authorRepository.existsById(id)) {
-            throw new NotFoundException("Author not found with id: " + id);
+            throw new NotFoundException("Autor não encontrado com o ID: " + id);
         }
         authorRepository.deleteById(id);
     }
